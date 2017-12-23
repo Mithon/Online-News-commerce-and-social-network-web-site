@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+
+
+	<context:annotation-config></context:annotation-config>
+	<context:component-scan base-package="edu.daffodil.ssb.dao"></context:component-scan>
+
+
+
+	<!-- jee:jndi-lookup jndi-name="jdbc/institutes" id="dataSource"
+		expected-type="javax.sql.DataSource">
+	</jee:jndi-lookup-->
+
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource"	destroy-method="close">
+        <property name="driverClassName" value="org.mariadb.jdbc.Driver" />
+        <property name="url" value="jdbc:mariadb://localhost:3306/ssb" />
+        <property name="username" value="root" />
+      <!--   <property name="password" value="12345" /> -->
+    </bean> 
+    
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<!-- prop key="hibernate.hbm2ddl.auto">update</prop-->
+			</props>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value>edu.daffodil.ssb.dao</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- >bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean-->
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+
+	<tx:annotation-driven />
+</beans>
